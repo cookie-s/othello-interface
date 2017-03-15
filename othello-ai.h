@@ -4,6 +4,6 @@
 #include "othello-def.h"
 
 void init(int color);
-Point turn(State board, int color, Point last_move);
+Point turn(State state, int color, Point last_move);
 
 #endif

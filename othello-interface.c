@@ -16,8 +16,9 @@ int valid_point(Point pt) {
 
 void place(Point place, int color) {
     int dx[] = {-1,0,1,-1,1,-1,0,1}, dy[] = {-1,-1,-1,0,0,1,1,1};
+
+    board[place.y][place.x] = color;
     for(int d=0; d<8; d++) {
-        if(board[place.y][place.x] != COLOR_NONE) continue;
         Point pt = {.x = place.x+dx[d], .y = place.y+dy[d]};
         if(!valid_point(pt) || board[place.y+dy[d]][place.x+dx[d]] != OPPONENT(color)) continue;
         while(valid_point(pt) && board[pt.y][pt.x] == OPPONENT(color)) pt.x+=dx[d], pt.y+=dy[d];
@@ -80,6 +81,7 @@ int load_functions(char *black_libname, char *white_libname) {
     turn_white = (fun_turn)dlsym(white_handle, "turn");
     if(!turn_white)
         return die_dlerror("Error occurs while loading white-turn");
+    return 0;
 }
 
 int main(int argc, char**argv) {
@@ -118,6 +120,7 @@ int main(int argc, char**argv) {
             fun_turn nowturn = turn == COLOR_BLACK ? turn_black : turn_white;
             last_move = nowturn(state, turn, last_move);
             if(!can_place(last_move, turn)) {
+                puts("noooooooooooooo");
                 win = OPPONENT(turn);
                 break;
             }
@@ -126,6 +129,24 @@ int main(int argc, char**argv) {
         }
         turn = OPPONENT(turn);
     }
-
+    if(win != COLOR_NONE) {
+        if(win == COLOR_BLACK)
+            puts("BLACK won!");
+        else
+            puts("WHITE won!");
+    }
+    else {
+        int black_count, white_count;
+        for(int y=0; y<BOARD_HEIGHT; y++)
+            for(int x=0; x<BOARD_WIDTH; x++)
+                if(board[y][x] == COLOR_BLACK) black_count++;
+                else if(board[y][x] == COLOR_WHITE) white_count++;
+        if(black_count > white_count)
+            puts("BLACK won!");
+        else if(black_count < white_count)
+            puts("WHITE won!");
+        else
+            puts("DRAW!");
+    }
     return 0;
 }
