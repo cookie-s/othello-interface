@@ -1,9 +1,19 @@
-.PHONY: all
+CC := gcc
+CFLAGS := -g
 
-all: othello sample/libhuman.so
+.PHONY: all clean linux windows
 
-othello: othello-interface.c othello-ai.h othello-def.h
-	gcc othello-interface.c -l dl -o othello
+all: linux
 
-sample/libhuman.so: sample/human.c
-	gcc -shared -fPIC sample/human.c -o sample/libhuman.so
+linux: othello-linux
+windows: othello-windows
+
+othello-linux: othello-interface.c othello-interface-loadlib-linux.c
+	$(CC) othello-interface.c othello-interface-loadlib-linux.c -ldl -o othello 
+
+othello-windows: othello-interface.c othello-interface-loadlib-windows.c
+	$(CC) othello-interface.c othello-interface-loadlib-windows.c -o othello 
+
+clean:
+	rm othello
+	cd sample && make clean
